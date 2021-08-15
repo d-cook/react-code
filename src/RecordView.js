@@ -17,9 +17,12 @@ export default function RecordView({ initValue, onValueUpdated }) {
     }
   };
   const setKey = (key, newKey) => {
-    record[newKey] = record[key];
-    delete record[key];
-    updateRecord(record);
+    if (key !== newKey) {
+      const value = record[key];
+      delete record[key];
+      record[newKey] = value;
+      updateRecord(record);
+    }
   };
   const setValue = (key, value) => {
     record[key] = value;
@@ -56,13 +59,13 @@ export default function RecordView({ initValue, onValueUpdated }) {
             key={"record-key-" + key}
             initValue={key}
             stringValued={true}
-            setValue={(newKey) => setKey(key, newKey)}
+            onValueUpdated={(newKey) => setKey(key, newKey)}
           />
           :
           <DynamicView
             key={"record-val-" + value}
             initValue={value}
-            setValue={(newVal) => setValue(key, newVal)}
+            onValueUpdated={(newVal) => setValue(key, newVal)}
           />
         </>
       ))}
