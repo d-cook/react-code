@@ -35,7 +35,7 @@ export default function ListView({ initValue, onValueUpdated }) {
         gridTemplateColumns: "min-content min-content min-content",
         rowGap: "2px",
         columnGap: "1px",
-        border: "1px solid #acf",
+        border: "1px solid #8aa",
         backgroundColor: "#def",
         borderRadius: "5px",
         padding: "2px",
@@ -44,18 +44,41 @@ export default function ListView({ initValue, onValueUpdated }) {
     >
       {items.map(({ value, key }, i) => (
         <>
-          <button onClick={() => addItem(i)}>+</button>
-          <button onClick={() => removeItem(i)}>-</button>
+          <span
+            style={{
+              fontSize: "10px",
+              color: "#678"
+            }}
+          >
+            {i}
+          </span>
           <DynamicView
             key={"list-" + key}
             initValue={value}
             onValueUpdated={(val) => updateItem(val, i)}
           />
+          <button
+            onClick={() => removeItem(i)}
+            style={{
+              padding: "0 2px",
+              backgroundColor: "#acc",
+              border: "1px solid #686",
+              borderRadius: "3px"
+            }}
+          >
+            -
+          </button>
         </>
       ))}
       <button
         onClick={() => addItem(items.length)}
-        style={{ gridColumn: "span 3" }}
+        style={{
+          gridColumn: "2 / span 2",
+          padding: "0",
+          backgroundColor: "#acc",
+          border: "1px solid #678",
+          borderRadius: "3px"
+        }}
       >
         +
       </button>

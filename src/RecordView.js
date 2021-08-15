@@ -43,7 +43,7 @@ export default function RecordView({ initValue, onValueUpdated }) {
         gridTemplateColumns: "min-content min-content min-content min-content",
         rowGap: "2px",
         columnGap: "1px",
-        border: "1px solid #8f8",
+        border: "1px solid #7a7",
         backgroundColor: "#cfc",
         borderRadius: "5px",
         padding: "2px",
@@ -52,7 +52,6 @@ export default function RecordView({ initValue, onValueUpdated }) {
     >
       {Object.entries(record).map(([key, value]) => (
         <>
-          <button onClick={() => removeEntry(key)}>-</button>
           <ValueView
             key={"record-key-" + key}
             initValue={key}
@@ -65,9 +64,29 @@ export default function RecordView({ initValue, onValueUpdated }) {
             initValue={value}
             setValue={(newVal) => setValue(key, newVal)}
           />
+          <button
+            onClick={() => removeEntry(key)}
+            style={{
+              padding: "0 2px",
+              backgroundColor: "#9c9",
+              border: "1px solid #686",
+              borderRadius: "3px"
+            }}
+          >
+            -
+          </button>
         </>
       ))}
-      <button onClick={() => addEntry()} style={{ gridColumn: "span 4" }}>
+      <button
+        onClick={() => addEntry()}
+        style={{
+          gridColumn: "span 4",
+          padding: "0",
+          backgroundColor: "#9c9",
+          border: "1px solid #686",
+          borderRadius: "3px"
+        }}
+      >
         +
       </button>
     </div>
