@@ -10,6 +10,7 @@ export default function App() {
       style={{
         display: "grid",
         gridTemplateColumns: "min-content min-content min-content min-content",
+        alignItems: "start",
         rowGap: "8px",
         columnGap: "8px"
       }}
