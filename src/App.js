@@ -1,14 +1,13 @@
 import "./styles.css";
-import ListView from "./ListView";
-import RecordView from "./RecordView";
+import DynamicView from "./DynamicView";
 
 function FuncView() {}
 
 export default function App() {
   return (
     <div className="App">
-      <ListView initValue={[1, 123, "test"]} />
-      <RecordView initValue={{ a: 123 }} />
+      <DynamicView initValue={[1, 2, { x: 3, y: 4 }, "5 6"]} />
+      <DynamicView initValue={{ a: 123, b: [4, 5, 6], c: 789 }} />
     </div>
   );
 }

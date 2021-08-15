@@ -1,5 +1,6 @@
-import ValueView from "./ValueView";
 import { useState } from "react";
+import ValueView from "./ValueView";
+import DynamicView from "./DynamicView";
 
 export default function RecordView({ initValue, onValueUpdated }) {
   const initRecord =
@@ -59,7 +60,7 @@ export default function RecordView({ initValue, onValueUpdated }) {
             setValue={(newKey) => setKey(key, newKey)}
           />
           :
-          <ValueView
+          <DynamicView
             key={"record-val-" + value}
             initValue={value}
             setValue={(newVal) => setValue(key, newVal)}

@@ -1,5 +1,5 @@
-import ValueView from "./ValueView";
 import { useState } from "react";
+import DynamicView from "./DynamicView";
 
 export default function ListView({ initValue, onValueUpdated }) {
   const initList = Array.isArray(initValue) ? initValue : [];
@@ -46,10 +46,10 @@ export default function ListView({ initValue, onValueUpdated }) {
         <>
           <button onClick={() => addItem(i)}>+</button>
           <button onClick={() => removeItem(i)}>-</button>
-          <ValueView
+          <DynamicView
             key={"list-" + key}
             initValue={value}
-            setValue={(val) => updateItem(val, i)}
+            onValueUpdated={(val) => updateItem(val, i)}
           />
         </>
       ))}
