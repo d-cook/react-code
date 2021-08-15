@@ -1,36 +1,16 @@
 import "./styles.css";
+import ValueView from "./ValueView";
 
-function FuncViewer() {
+function FuncView() {}
 
-}
+function RecordView() {}
 
-function FuncView() {
-
-}
-
-function StepsView() {
-
-}
-
-function RecordView() {
-
-}
-
-function ListView() {
-
-}
-
-function ValueView() {
-  return (
-    <input type="text" />
-  );
-}
+function ListView() {}
 
 export default function App() {
   return (
     <div className="App">
-      <h1>Hello CodeSandbox</h1>
-      <h2>Start editing to see some magic happen!</h2>
+      <ValueView initValue={27} />
     </div>
   );
 }
