@@ -30,7 +30,7 @@ export default function RecordView({ initValue, onValueUpdated }) {
     while (Object.hasOwnProperty.call(record, key)) {
       key = "value" + idx++;
     }
-    setValue(key, null);
+    setValue(key, 0);
   };
   const removeEntry = (key) => {
     delete record[key];
@@ -40,7 +40,7 @@ export default function RecordView({ initValue, onValueUpdated }) {
     <div
       style={{
         display: "inline-grid",
-        gridTemplateColumns: "min-content min-content min-content min-content",
+        gridTemplateColumns: "min-content min-content min-content",
         rowGap: "4px",
         columnGap: "4px",
         border: "1px solid #7a7",
@@ -64,27 +64,12 @@ export default function RecordView({ initValue, onValueUpdated }) {
             initValue={value}
             setValue={(newVal) => setValue(key, newVal)}
           />
-          <button
-            onClick={() => removeEntry(key)}
-            style={{
-              padding: "0 2px",
-              backgroundColor: "#9c9",
-              border: "1px solid #686",
-              borderRadius: "3px",
-              margin: "auto",
-              height: "auto",
-              fontSize: "12px",
-              lineHeight: "10px"
-            }}
-          >
-            -
-          </button>
         </>
       ))}
       <button
         onClick={() => addEntry()}
         style={{
-          gridColumn: "span 4",
+          gridColumn: "span 3",
           padding: "0",
           backgroundColor: "#9c9",
           border: "1px solid #686",

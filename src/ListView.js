@@ -20,7 +20,7 @@ export default function ListView({ initValue, onValueUpdated }) {
   const addItem = (index) => {
     const start = items.slice(0, index);
     const end = items.slice(index);
-    const item = { value: null, key: nextKey + 1 };
+    const item = { value: 0, key: nextKey + 1 };
     updateList(start.concat(item).concat(end), item.key);
   };
   const removeItem = (index) => {
@@ -32,7 +32,7 @@ export default function ListView({ initValue, onValueUpdated }) {
     <div
       style={{
         display: "inline-grid",
-        gridTemplateColumns: "min-content min-content",
+        gridTemplateColumns: "min-content",
         rowGap: "4px",
         columnGap: "4px",
         border: "1px solid #8aa",
@@ -49,27 +49,11 @@ export default function ListView({ initValue, onValueUpdated }) {
             initValue={value}
             onValueUpdated={(val) => updateItem(val, i)}
           />
-          <button
-            onClick={() => removeItem(i)}
-            style={{
-              padding: "0 2px",
-              backgroundColor: "#acc",
-              border: "1px solid #686",
-              borderRadius: "3px",
-              height: "auto",
-              margin: "auto",
-              fontSize: "12px",
-              lineHeight: "10px"
-            }}
-          >
-            -
-          </button>
         </>
       ))}
       <button
         onClick={() => addItem(items.length)}
         style={{
-          gridColumn: "span 2",
           padding: "0",
           backgroundColor: "#acc",
           border: "1px solid #678",
