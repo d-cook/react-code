@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function ValueView({ initValue, setValue }) {
+export default function ValueView({ initValue, onValueUpdated }) {
   const [{ input, value }, setState] = useState({
     input: JSON.stringify(initValue),
     value: initValue
@@ -12,8 +12,8 @@ export default function ValueView({ initValue, setValue }) {
     try {
       const parsedValue = JSON.parse(input);
       setState({ input, value: parsedValue });
-      if (typeof setValue === "function") {
-        setValue(parsedValue);
+      if (typeof onValueUpdated === "function") {
+        onValueUpdated(parsedValue);
       }
     } catch {
       reset();
