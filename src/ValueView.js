@@ -40,7 +40,10 @@ export default function ValueView({ initValue, stringValued, onValueUpdated }) {
           reset();
         }
       }}
-      style={{ width: Math.floor(input.length * 1.3) + "ch" }}
+      style={{
+        width: Math.floor(input.length * 1.3) + "ch",
+        padding: "0 2px"
+      }}
     ></input>
   );
 }

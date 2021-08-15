@@ -41,13 +41,13 @@ export default function RecordView({ initValue, onValueUpdated }) {
       style={{
         display: "inline-grid",
         gridTemplateColumns: "min-content min-content min-content min-content",
-        rowGap: "2px",
-        columnGap: "1px",
+        rowGap: "4px",
+        columnGap: "4px",
         border: "1px solid #7a7",
         backgroundColor: "#cfc",
-        borderRadius: "5px",
-        padding: "2px",
-        margin: "2px"
+        borderRadius: "8px",
+        padding: "4px",
+        alignItems: "start"
       }}
     >
       {Object.entries(record).map(([key, value]) => (
@@ -70,7 +70,11 @@ export default function RecordView({ initValue, onValueUpdated }) {
               padding: "0 2px",
               backgroundColor: "#9c9",
               border: "1px solid #686",
-              borderRadius: "3px"
+              borderRadius: "3px",
+              margin: "auto",
+              height: "auto",
+              fontSize: "12px",
+              lineHeight: "10px"
             }}
           >
             -
@@ -84,7 +88,10 @@ export default function RecordView({ initValue, onValueUpdated }) {
           padding: "0",
           backgroundColor: "#9c9",
           border: "1px solid #686",
-          borderRadius: "3px"
+          borderRadius: "3px",
+          height: "auto",
+          fontSize: "10px",
+          lineHeight: "9px"
         }}
       >
         +
