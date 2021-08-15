@@ -31,10 +31,15 @@ export default function ListView({ initValue, onValueUpdated }) {
   return (
     <div
       style={{
-        display: "grid",
+        display: "inline-grid",
         gridTemplateColumns: "min-content min-content min-content",
         rowGap: "2px",
-        columnGap: "1px"
+        columnGap: "1px",
+        border: "1px solid #acf",
+        backgroundColor: "#def",
+        borderRadius: "5px",
+        padding: "2px",
+        margin: "2px"
       }}
     >
       {items.map(({ value, key }, i) => (
@@ -42,7 +47,7 @@ export default function ListView({ initValue, onValueUpdated }) {
           <button onClick={() => addItem(i)}>+</button>
           <button onClick={() => removeItem(i)}>-</button>
           <ValueView
-            key={key}
+            key={"list-" + key}
             initValue={value}
             setValue={(val) => updateItem(val, i)}
           />

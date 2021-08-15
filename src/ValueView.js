@@ -1,16 +1,16 @@
 import { useState } from "react";
 
-export default function ValueView({ initValue, onValueUpdated }) {
+export default function ValueView({ initValue, stringValued, onValueUpdated }) {
   const [{ input, value }, setState] = useState({
-    input: JSON.stringify(initValue),
-    value: initValue
+    input: stringValued ? String(initValue) : JSON.stringify(initValue),
+    value: stringValued ? String(initValue) : initValue
   });
   const setInput = (input) => {
     setState({ input, value });
   };
   const update = () => {
     try {
-      const parsedValue = JSON.parse(input);
+      const parsedValue = stringValued ? input : JSON.parse(input);
       setState({ input, value: parsedValue });
       if (typeof onValueUpdated === "function") {
         onValueUpdated(parsedValue);
@@ -20,7 +20,10 @@ export default function ValueView({ initValue, onValueUpdated }) {
     }
   };
   const reset = () => {
-    setState({ value, input: JSON.stringify(value) });
+    setState({
+      value,
+      input: stringValued ? value : JSON.stringify(value)
+    });
   };
   return (
     <input
