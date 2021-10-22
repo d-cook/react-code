@@ -1,29 +1,36 @@
-import { useState } from "react";
+import { ReactElement, useState } from "react";
+import { ViewInputs } from "./View";
 
-export default function ValueView({ initValue, stringValued, onValueUpdated }) {
+type Inputs = ViewInputs & {
+  stringValued: boolean;
+};
+
+export default function ValueView({
+  initValue,
+  stringValued,
+  onValueUpdated
+}: Inputs): ReactElement {
   const [{ input, value }, setState] = useState({
     input: stringValued ? String(initValue) : JSON.stringify(initValue),
     value: stringValued ? String(initValue) : initValue
   });
-  const setInput = (input) => {
+  const setInput = (input: string) => {
     setState({ input, value });
+  };
+  const reset = () => {
+    setState({
+      value,
+      input: stringValued ? (value as string) : JSON.stringify(value)
+    });
   };
   const update = () => {
     try {
       const parsedValue = stringValued ? input : JSON.parse(input);
       setState({ input, value: parsedValue });
-      if (typeof onValueUpdated === "function") {
-        onValueUpdated(parsedValue);
-      }
+      onValueUpdated?.call(null, parsedValue);
     } catch {
       reset();
     }
-  };
-  const reset = () => {
-    setState({
-      value,
-      input: stringValued ? value : JSON.stringify(value)
-    });
   };
   return (
     <input

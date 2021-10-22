@@ -1,22 +1,24 @@
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import ValueView from "./ValueView";
 import DynamicView from "./DynamicView";
+import { ViewInputs } from "./View";
 
-export default function RecordView({ initValue, onValueUpdated }) {
+export default function RecordView({
+  initValue,
+  onValueUpdated
+}: ViewInputs): ReactElement {
   const initRecord =
     initValue && typeof initValue === "object" && !Array.isArray(initValue)
-      ? initValue
+      ? (initValue as Record<string, any>)
       : {};
   const [{ record }, setState] = useState({
     record: initRecord
   });
-  const updateRecord = (record) => {
+  const updateRecord = (record: Record<string, any>) => {
     setState({ record });
-    if (typeof onValueUpdated === "function") {
-      onValueUpdated(record);
-    }
+    onValueUpdated?.call(null, record);
   };
-  const setKey = (key, newKey) => {
+  const setKey = (key: string, newKey: string) => {
     if (key !== newKey) {
       const value = record[key];
       delete record[key];
@@ -24,7 +26,7 @@ export default function RecordView({ initValue, onValueUpdated }) {
       updateRecord(record);
     }
   };
-  const setValue = (key, value) => {
+  const setValue = (key: string, value: any) => {
     record[key] = value;
     updateRecord(record);
   };
@@ -35,10 +37,12 @@ export default function RecordView({ initValue, onValueUpdated }) {
     }
     setValue(key, 0);
   };
-  const removeEntry = (key) => {
+  /*
+  const removeEntry = (key: string) => {
     delete record[key];
     updateRecord(record);
   };
+  */
   return (
     <div
       style={{
@@ -53,7 +57,7 @@ export default function RecordView({ initValue, onValueUpdated }) {
         alignItems: "start"
       }}
     >
-      {Object.entries(record).map(([key, value]) => (
+      {Object.entries(record).map(([key, value]: [string, any]) => (
         <>
           <ValueView
             key={"record-key-" + key}

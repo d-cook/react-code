@@ -1,33 +1,45 @@
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import DynamicView from "./DynamicView";
+import { ViewInputs } from "./View";
 
-export default function ListView({ initValue, onValueUpdated }) {
+type Entry = {
+  key: number;
+  value: any;
+};
+
+export default function ListView({
+  initValue,
+  onValueUpdated
+}: ViewInputs): ReactElement {
   const initList = Array.isArray(initValue) ? initValue : [];
   const [{ items, nextKey }, setState] = useState({
-    items: initList.map((value, key) => ({ value, key })),
+    items: initList.map((value, key) => ({ value, key } as Entry)),
     nextKey: initList.length
   });
-  const updateList = (items, nextKey) => {
+  const updateList = (items: Entry[], nextKey: number) => {
     setState({ items, nextKey });
-    if (typeof onValueUpdated === "function") {
-      onValueUpdated(items.map(({ value }) => value));
-    }
+    onValueUpdated?.call(
+      null,
+      items.map(({ value }) => value)
+    );
   };
-  const updateItem = (value, index) => {
+  const updateItem = (value: any, index: number) => {
     items[index].value = value;
     updateList(items, nextKey);
   };
-  const addItem = (index) => {
+  const addItem = (index: number) => {
     const start = items.slice(0, index);
     const end = items.slice(index);
     const item = { value: 0, key: nextKey + 1 };
     updateList(start.concat(item).concat(end), item.key);
   };
+  /*
   const removeItem = (index) => {
     const start = items.slice(0, index);
     const end = items.slice(index + 1);
     updateList(start.concat(end), nextKey);
   };
+  */
   return (
     <div
       style={{

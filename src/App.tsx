@@ -1,7 +1,7 @@
 import "./styles.css";
 import DynamicView from "./DynamicView";
 
-function FuncView() {}
+// function FuncView(): void {}
 
 export default function App() {
   return (
