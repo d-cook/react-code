@@ -2,6 +2,7 @@ import { ReactElement, useState } from "react";
 import ValueView from "./ValueView";
 import DynamicView from "./DynamicView";
 import { ViewInputs } from "./View";
+import * as React from "react";
 
 export default function RecordView({
   initValue,

@@ -1,5 +1,6 @@
 import "./styles.css";
 import DynamicView from "./DynamicView";
+import * as React from "react";
 
 // function FuncView(): void {}
 

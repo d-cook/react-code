@@ -1,3 +1,4 @@
+import * as React from "react";
 import { ReactElement, useState } from "react";
 import { ViewInputs } from "./View";
 
