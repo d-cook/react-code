@@ -22,12 +22,25 @@ function Lookup(context: Context, [ctxIdx, val]: CodeRef): any {
   return Lookup(sc, [ctxIdx - 1, val]);
 }
 
+/* eslint-disable @typescript-eslint/no-use-before-define */
+function Apply(context: Context, func: Func | Function, argVals: any[]): any {
+  if (typeof func === "function") {
+    try {
+      return func.apply(context, argVals);
+    } catch {
+      return null;
+    }
+  }
+  const ctx = EvalFunc(func.context || context, func, argVals);
+  const vals = ctx.values;
+  return vals.length > 0 ? vals[vals.length - 1] : null;
+}
+
 function Eval(context: Context, expr: Expression): any {
   const { op, args } = expr as Operation;
   if (!op) return (expr as ValueExpr).value;
   const func = Lookup(context, op);
   const argVals = args.map((ref) => Lookup(context, ref));
-  /* eslint-disable @typescript-eslint/no-use-before-define */
   return Apply(context, func, argVals);
 }
 
@@ -45,25 +58,13 @@ function EvalFunc(
   return newContext;
 }
 
-function Apply(context: Context, func: any, argVals: any[]): any {
-  if (typeof func === "function") {
-    try {
-      return func.apply(context, argVals);
-    } catch {
-      return null;
-    }
-  }
-  const ctx = EvalFunc(func.context || context, func, argVals);
-  const vals = ctx.values;
-  return vals.length > 0 ? vals[vals.length - 1] : null;
-}
-
-// Func to "create" the entire runtime from inline values:
+// Create a Func that "creates" the entire runtime...
 const Bootstrap: Func = {
   context: null,
   argNames: [],
   code: []
 };
+// ...from a bunch of inline-value expressions:
 Bootstrap.code = Object.entries({
   Lookup,
   Apply,
@@ -73,10 +74,17 @@ Bootstrap.code = Object.entries({
   ...Operations
 }).map(([label, value]) => ({ label, value }));
 
-// "Root" execution context of the runtime:
+// Evaluate the Bootstrap to "create" the runtime,
+// and capture result as the "Root" execution context:
 const RootContext = EvalFunc(null, Bootstrap, []);
+
+// Update all runtime Funcs to execute in Root Context:
 RootContext.values
   .filter((v: Func) => v && v.code && !v.context)
   .forEach((v: Func) => (v.context = RootContext));
+
+// The runtime has now effectively "created itself":
+// * RootContext.source === Bootstrap, which legit created it.
+// * Bootstrap.context === RootContext, which it legit runs in.
 
 export { Eval, EvalFunc, Apply, RootContext };
