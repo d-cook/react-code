@@ -11,7 +11,11 @@ import Operations from "./Operations";
 function Lookup(context: Context, [ctxIdx, val]: CodeRef): any {
   if (ctxIdx < 0) return val;
   if (ctxIdx < 1) {
-    return val < 0 ? context.argVals[-val - 1] : context.values[val];
+    return val < 0
+      ? context.argVals[-val - 1]
+      : val > 0
+      ? context.values[+val - 1]
+      : context; // Bad idea? return null instead?
   }
   const sc = context.source.context;
   if (sc === null || !(ctxIdx > 0)) return null;
