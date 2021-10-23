@@ -8,12 +8,12 @@ import {
 } from "./Types";
 import Operations from "./Operations";
 
-function Lookup(context: Context, [index, val]: CodeRef): any {
-  if (index === 0) return val;
-  if (index === 1) return context.values[val];
-  if (index < 0) return context.argVals[val];
-  if (context.context === null) return null;
-  return Lookup(context.context, [index - 1, val]);
+function Lookup(context: Context, [ctxIdx, val]: CodeRef): any {
+  if (ctxIdx < 0) return context.argVals[val];
+  if (ctxIdx < 1) return val;
+  if (ctxIdx < 2) return context.values[val];
+  if (context.source.context === null) return null;
+  return Lookup(context.source.context, [ctxIdx - 1, val]);
 }
 
 function Eval(context: Context, expr: Expression): any {
@@ -51,14 +51,12 @@ function Apply(context: Context, func: any, argVals: any[]): any {
   return vals.length > 0 ? vals[vals.length - 1] : null;
 }
 
-// Func that will "create" entire runtime from inline values
+// Func to "create" the entire runtime from inline values:
 const Bootstrap: Func = {
   context: null,
   argNames: [],
   code: []
 };
-
-// Code EVERY function in the runtime as inline values:
 Bootstrap.code = Object.entries({
   Lookup,
   Apply,
@@ -68,11 +66,9 @@ Bootstrap.code = Object.entries({
   ...Operations
 }).map(([label, value]) => ({ label, value }));
 
+// "Root" execution context of the runtime:
 const RootContext = EvalFunc(null, Bootstrap, []);
-
-// Default the context of runtime Funcs to RootContext:
-Bootstrap.code
-  .map(({ value }: ValueExpr) => value)
+RootContext.values
   .filter((v: Func) => v && v.code && !v.context)
   .forEach((v: Func) => (v.context = RootContext));
 

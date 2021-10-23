@@ -1,5 +1,7 @@
+// Each Function is created within some execution Context.
+// Each Context is created as a result of calling some Func.
+
 type Context = {
-  context: Context | null;
   argVals: any[];
   values: any[];
   source: Func;
