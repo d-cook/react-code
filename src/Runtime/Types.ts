@@ -36,5 +36,5 @@ export {
   CodeRef,
   ValRef,
   ArgRef,
-  ValueRef
+  InlineVal
 };
