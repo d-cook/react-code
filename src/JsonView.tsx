@@ -20,7 +20,7 @@ const listStyles = {
   backgroundColor: "#def",
   borderRadius: "8px",
   padding: "4px",
-  alignItems: "start",
+  alignItems: "stretch",
   justifyItems: "stretch"
 };
 
@@ -33,7 +33,7 @@ const recordStyles = {
   backgroundColor: "#cfc",
   borderRadius: "8px",
   padding: "4px",
-  alignItems: "start",
+  alignItems: "stretch",
   justifyItems: "stretch"
 };
 
@@ -41,10 +41,17 @@ export default function JsonView({
   value,
   onValueClicked
 }: Inputs): ReactElement {
-  const MakeView = (value: any, path: Key[], escape = true): ReactElement => {
+  const MakeView = (
+    value: any,
+    path: Key[],
+    vals: any[],
+    escape = true
+  ): ReactElement => {
     const type =
       value === null
         ? "null"
+        : vals.includes(value)
+        ? "repeat"
         : Array.isArray(value)
         ? "list"
         : typeof value === "object"
@@ -65,19 +72,25 @@ export default function JsonView({
         style={styles}
       >
         {type === "list"
-          ? (value as any[]).map((v, i) => MakeView(v, path.concat(i)))
+          ? (value as any[]).map((v, i) =>
+              MakeView(v, path.concat(i), vals.concat([value]))
+            )
           : type === "record"
           ? Object.entries(value).map(([k, v]) => (
               <>
-                {MakeView(k, path.concat("k" + k), false)} :
-                {MakeView(v, path.concat("v" + k))}
+                {MakeView(k, path.concat("k" + k), vals, false)} :
+                {MakeView(v, path.concat("v" + k), vals.concat(value))}
               </>
             ))
+          : type === "function"
+          ? "[func]"
+          : type === "repeat"
+          ? "[...]"
           : escape
           ? JSON.stringify(value)
           : value}
       </div>
     );
   };
-  return MakeView(value, []);
+  return MakeView(value, [], []);
 }
