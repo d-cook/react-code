@@ -9,11 +9,13 @@ import {
 import Operations from "./Operations";
 
 function Lookup(context: Context, [ctxIdx, val]: CodeRef): any {
-  if (ctxIdx < 0) return context.argVals[val];
-  if (ctxIdx < 1) return val;
-  if (ctxIdx < 2) return context.values[val];
-  if (context.source.context === null) return null;
-  return Lookup(context.source.context, [ctxIdx - 1, val]);
+  if (ctxIdx < 0) return val;
+  if (ctxIdx < 1) {
+    return val < 0 ? context.argVals[-val - 1] : context.values[val];
+  }
+  const sc = context.source.context;
+  if (sc === null || !(ctxIdx > 0)) return null;
+  return Lookup(sc, [ctxIdx - 1, val]);
 }
 
 function Eval(context: Context, expr: Expression): any {

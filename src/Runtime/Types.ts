@@ -15,17 +15,11 @@ type Func = {
 
 type Expression = ValueExpr | Operation;
 type ValueExpr = { label: string; value: any };
-type Operation = { label: string; op: CodeRef; args: CodeRef[] };
+type Operation = { label: string; op: ValueRef; args: ValueRef[] };
 
-type CodeRef = ValRef | ArgRef | InlineVal;
-type ValRef = [ContextIndex, ValueIndex];
-type ArgRef = [IndexForArgs, ValueIndex];
-type InlineVal = [IndexForValue, any];
-
-type ContextIndex = number; // positive integer
-type ValueIndex = number;
-type IndexForArgs = -1;
-type IndexForValue = 0;
+type ValueRef = LookupValue | InlineValue;
+type LookupValue = [contextIndex: number, valueIndex: number];
+type InlineValue = [contextIndex: -1, value: any];
 
 export {
   Context,
@@ -34,7 +28,6 @@ export {
   ValueExpr,
   Operation,
   CodeRef,
-  ValRef,
-  ArgRef,
-  InlineVal
+  LookupValue,
+  InlineValue
 };
