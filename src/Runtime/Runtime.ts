@@ -38,6 +38,7 @@ function EvalFunc(
 ): Context {
   const values: any[] = [];
   const newContext = { context, source: func, argVals, values };
+  // Can't use map: each value needs access to the prev ones
   func.code.forEach((expr, i) => {
     values[i] = Eval(newContext, expr);
   });
