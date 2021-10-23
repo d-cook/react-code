@@ -1,3 +1,6 @@
+import { Apply } from "./Runtime";
+import { Context } from "./Types";
+
 const IsNone = (val: any) => val === null || val === void 0 || isNaN(val);
 const IsBool = (val: any) => typeof val === "boolean";
 const IsList = (val: any) => Array.isArray(val);
@@ -21,17 +24,7 @@ const TypeOf = (val: any) => {
   return "None";
 };
 
-const CanKey = (obj: any, key: any) =>
-  (IsRecord(obj) && IsString(key)) || (IsList(obj) && IsNumber(key));
-
-const Has = (obj: any, key: any) =>
-  CanKey(obj, key) && Object.hasOwnProperty.call(obj, key);
-const Get = (obj: any, ...keys: any[]) =>
-  keys.length > 0
-    ? keys.reduce((o, k) => (CanKey(o, k) ? o[k] : null), obj)
-    : null;
-const Set = (obj: any, key: any, val: any) =>
-  CanKey(obj, key) ? (obj[key] = val) : null;
+// Container operations:
 
 const Length = (obj: any) =>
   IsList(obj) || IsString(obj)
@@ -40,10 +33,110 @@ const Length = (obj: any) =>
     ? Object.keys(obj).length
     : null;
 
-const And = (a: any, ...b: any[]) => b.reduce((res, v) => res && v, a);
-const Or = (a: any, ...b: any[]) => b.reduce((res, v) => res || v, a);
+const IsEmpty = (obj: any) => Length(obj) === 0;
+const NonEmpty = (obj: any) => Length(obj) > 0;
 
-const _ops = {
+const AsList = (obj: any): any[] =>
+  IsList(obj)
+    ? obj
+    : IsString(obj)
+    ? obj.split("")
+    : IsRecord(obj)
+    ? Object.entries(obj)
+    : [];
+
+// String operations:
+
+const Substr = (str: any, ...args: any[]) =>
+  IsString(str) ? str.substring(...args) : null;
+
+const Split = (str: any, ...args: any[]) =>
+  IsString(str) ? str.split(...args) : null;
+
+const IndexOf = (str: any, val: any) =>
+  IsString(str) ? str.indexOf(val) : AsList(str).indexOf(val);
+
+// List operations:
+
+const Slice = (list: any, ...args: any[]): any[] => AsList(list).slice(...args);
+const Append = (list: any, ...args: any[]): any[] => AsList(list).concat(args);
+const Concat = (list: any, ...args: any[]): any[] =>
+  AsList(list).concat(...args);
+
+function Map(this: Context, list: any, func: any): any[] {
+  return AsList(list).map((...args: any[]) => Apply(this, func, args));
+}
+
+function Filter(this: Context, list: any, func: any): any[] {
+  return AsList(list).filter((...args: any[]) => Apply(this, func, args));
+}
+
+function Reduce(this: Context, list: any, func: any): any[] {
+  return AsList(list).reduce((...args: any[]) => Apply(this, func, args));
+}
+
+function Any(this: Context, list: any, func: any): boolean {
+  return AsList(list).some((...args: any[]) => Apply(this, func, args));
+}
+
+function All(this: Context, list: any, func: any): boolean {
+  return AsList(list).every((...args: any[]) => Apply(this, func, args));
+}
+
+function Find(this: Context, list: any, func: any): any {
+  return AsList(list).find((...args: any[]) => Apply(this, func, args));
+}
+
+function FindIndex(this: Context, list: any, func: any): number {
+  return AsList(list).findIndex((...args: any[]) => Apply(this, func, args));
+}
+
+// Record operations:
+
+const HasKey = (obj: any, key: any) =>
+  IsRecord(obj)
+    ? Object.hasOwnProperty.call(obj, key)
+    : AsList(obj).length > key;
+
+const Get = (obj: any, ...keys: any[]) =>
+  keys.length > 0
+    ? keys.reduce((o, k) => {
+        return IsRecord(o) && IsString(k)
+          ? o[k]
+          : IsNumber(k)
+          ? AsList(o)[k]
+          : null;
+      }, obj)
+    : null;
+
+const Set = (obj: any, key: any, val: any) =>
+  IsRecord(obj) && IsString(key)
+    ? (obj[key] = val)
+    : IsNumber(key)
+    ? (AsList(obj)[key] = val)
+    : null;
+
+// Other operations:
+
+function If(this: Context, condition: any, T: any, F: any): any {
+  return Apply(this, IsTrue(condition) ? T : F, []);
+}
+
+function And(this: Context, val: any, ...otherVals: any[]): boolean {
+  if (Not(val)) return false;
+  if (otherVals.length < 1) return true;
+  const [next, ...rest] = otherVals;
+  return And.call(this, Apply(this, next, []), ...rest);
+}
+
+function Or(this: Context, val: any, ...otherVals: any[]): boolean {
+  if (IsTrue(val)) return true;
+  if (otherVals.length < 1) return false;
+  const [next, ...rest] = otherVals;
+  return Or.call(this, Apply(this, next, []), ...rest);
+}
+
+const _operators = {
   "+": (a: any, ...b: any[]) => b.reduce((res, v) => res + v, a),
   "-": (a: any, ...b: any[]) => b.reduce((res, v) => res - v, a),
   "*": (a: any, ...b: any[]) => b.reduce((res, v) => res * v, a),
@@ -68,11 +161,28 @@ export default {
   Not,
   IsTrue,
   TypeOf,
-  Has,
+  HasKey,
   Get,
   Set,
   Length,
+  IsEmpty,
+  NonEmpty,
+  AsList,
+  Substr,
+  Split,
+  IndexOf,
+  Slice,
+  Append,
+  Concat,
+  Map,
+  Filter,
+  Reduce,
+  Any,
+  All,
+  Find,
+  FindIndex,
+  If,
   And,
   Or,
-  ..._ops
+  ..._operators
 };
