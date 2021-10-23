@@ -91,6 +91,11 @@ function FindIndex(this: Context, list: any, func: any): number {
   return AsList(list).findIndex((...args: any[]) => Apply(this, func, args));
 }
 
+function ForEach(this: Context, list: any, func: any): any {
+  const values = Map.call(this, list, func);
+  return values.length > 0 ? values[values.length - 1] : null;
+}
+
 // Record operations:
 
 const HasKey = (obj: any, key: any) =>
@@ -181,6 +186,7 @@ export default {
   All,
   Find,
   FindIndex,
+  ForEach,
   If,
   And,
   Or,

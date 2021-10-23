@@ -1,4 +1,11 @@
-import { CodeRef, Context, Expression, Func, InlineValue } from "./Types";
+import {
+  CodeRef,
+  Context,
+  Expression,
+  Func,
+  Operation,
+  ValueExpr
+} from "./Types";
 import Operations from "./Operations";
 
 function Lookup(context: Context, [index, val]: CodeRef): any {
@@ -10,8 +17,9 @@ function Lookup(context: Context, [index, val]: CodeRef): any {
 }
 
 function Eval(context: Context, expr: Expression): any {
-  if (expr[0] === 0) return expr[1];
-  const [func, ...args] = expr.map((ref) => Lookup(context, ref));
+  const op = (expr as Operation).op;
+  if (!op) return (expr as ValueExpr).value;
+  const [func, ...args] = op.map((ref) => Lookup(context, ref));
   /* eslint-disable @typescript-eslint/no-use-before-define */
   return Apply(context, func, args);
 }
@@ -46,28 +54,25 @@ function Apply(context: Context, func: any, argVals: any[]): any {
 const Bootstrap: Func = {
   context: null,
   argNames: [],
-  varNames: {},
   code: []
 };
 
-// EVERY function in the runtime, as [name, value] entries:
-const _runtime = Object.entries({
+// Code EVERY function in the runtime as inline values:
+Bootstrap.code = Object.entries({
   Lookup,
   Apply,
   Eval,
   EvalFunc,
   Bootstrap,
   ...Operations
-} as Record<string, Func | Function>);
+}).map(([label, value]) => ({ label, value }));
 
-Bootstrap.varNames = Object.fromEntries(_runtime.map(([k], i) => [k, i]));
-Bootstrap.code = _runtime.map(([k, v]) => [0, v] as InlineValue);
 const RootContext = EvalFunc(null, Bootstrap, []);
 
-_runtime.forEach(([k, v]) => {
-  if (typeof v !== "function" && !v.context) {
-    v.context = RootContext;
-  }
-});
+// Default the context of runtime Funcs to RootContext:
+Bootstrap.code
+  .map(({ value }: ValueExpr) => value)
+  .filter((v: Func) => v && v.code && !v.context)
+  .forEach((v: Func) => (v.context = RootContext));
 
 export { Eval, EvalFunc, Apply, RootContext };
