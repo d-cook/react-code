@@ -84,7 +84,7 @@ RootContext.values
   .forEach((v: Func) => (v.context = RootContext));
 
 // The runtime has now effectively "created itself":
-// * RootContext.source === Bootstrap, which legit created it.
-// * Bootstrap.context === RootContext, which it legit runs in.
+// * RootContext.source === Bootstrap, which *did* create it.
+// * Bootstrap.context === RootContext, which it *does* run in.
 
 export { Eval, EvalFunc, Apply, RootContext };
