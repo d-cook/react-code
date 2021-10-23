@@ -12,12 +12,18 @@ type Func = {
 };
 
 type Expression = ValueExpr | Operation;
-type ValueExpr = { label: string, value: any };
-type Operation = { label: string, op: [CodeRef, ...CodeRef[]] };
-type CodeRef = ValRef | ArgRef | ValueRef;
-type ValRef = [contextIndex: number, valIndex: number];
-type ArgRef = [-1, number]; // argument number
-type ValueRef = [0, any]; // an immediate value
+type ValueExpr = { label: string; value: any };
+type Operation = { label: string; op: CodeRef; args: CodeRef[] };
+
+type CodeRef = ValRef | ArgRef | InlineVal;
+type ValRef = [ContextIndex, ValueIndex];
+type ArgRef = [IndexForArgs, ValueIndex];
+type InlineVal = [IndexForValue, any];
+
+type ContextIndex = number; // positive integer
+type ValueIndex = number;
+type IndexForArgs = -1;
+type IndexForValue = 0;
 
 export {
   Context,
@@ -28,5 +34,5 @@ export {
   CodeRef,
   ValRef,
   ArgRef,
-  ValueRef,
-}
+  ValueRef
+};

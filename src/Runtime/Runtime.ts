@@ -17,11 +17,12 @@ function Lookup(context: Context, [index, val]: CodeRef): any {
 }
 
 function Eval(context: Context, expr: Expression): any {
-  const op = (expr as Operation).op;
+  const { op, args } = expr as Operation;
   if (!op) return (expr as ValueExpr).value;
-  const [func, ...args] = op.map((ref) => Lookup(context, ref));
+  const func = Lookup(context, op);
+  const argVals = args.map((ref) => Lookup(context, ref));
   /* eslint-disable @typescript-eslint/no-use-before-define */
-  return Apply(context, func, args);
+  return Apply(context, func, argVals);
 }
 
 function EvalFunc(
