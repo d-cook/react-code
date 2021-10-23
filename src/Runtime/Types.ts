@@ -27,7 +27,7 @@ export {
   Expression,
   ValueExpr,
   Operation,
-  CodeRef,
+  ValueRef,
   LookupValue,
   InlineValue
 };

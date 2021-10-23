@@ -1,14 +1,14 @@
 import {
-  CodeRef,
   Context,
   Expression,
   Func,
   Operation,
-  ValueExpr
+  ValueExpr,
+  ValueRef
 } from "./Types";
 import Operations from "./Operations";
 
-function Lookup(context: Context, [ctxIdx, val]: CodeRef): any {
+function Lookup(context: Context, [ctxIdx, val]: ValueRef): any {
   if (ctxIdx < 0) return val;
   if (ctxIdx < 1) {
     return val < 0
@@ -58,6 +58,54 @@ function EvalFunc(
   return newContext;
 }
 
+// Work in progress, untested:
+function Compile(func: Func): Function {
+  const context: Context = func.context || {
+    source: {
+      context: RootContext,
+      argNames: [],
+      code: [{ label: "Compile", op: [-1, Compile], args: [[-1, func]] }]
+    },
+    argVals: [],
+    values: []
+  };
+  const _toStr = (val: any): string => {
+    try {
+      return JSON.stringify(val);
+    } catch {
+      return String(val);
+    }
+  };
+  const _lookup = (ref: ValueRef): string => {
+    if (ref[0] < 0) return _toStr(ref[1]);
+    if (ref[0] < 1) {
+      return ref[1] < 0
+        ? `a${-ref[1] - 1}`
+        : ref[1] > 0
+        ? `v${ref[1] - 1}`
+        : "this";
+    }
+    const times = Array(ref[0]).fill(0);
+    const ctx = times.reduce((s) => `((${s}.source||{}).context||{})`, "this");
+    if (ref[1] === 0) return ctx;
+    return ref[1] < 0
+      ? `${ctx}.argVals[${-ref[1] - 1}]`
+      : `${ctx}.values[${+ref[1] - 1}]`;
+  };
+  const body = func.code
+    .map((expr) => {
+      const { op, args } = expr as Operation;
+      if (!op) return _toStr((expr as ValueExpr).value);
+      const func = _lookup(op);
+      const argVals = args.map(_lookup).join(",");
+      return `((f,...args) => typeof f === 'function' ? f(...args) : null)(${func},${argVals})`;
+    })
+    .map((expr, i) => `const v${i}=(${expr});`)
+    .join("\n");
+  const argNames = func.argNames.map((n, i) => `a${i}`);
+  return Function(...argNames, body).bind(context);
+}
+
 // Create a Func that "creates" the entire runtime...
 const Bootstrap: Func = {
   context: null,
@@ -70,6 +118,7 @@ Bootstrap.code = Object.entries({
   Apply,
   Eval,
   EvalFunc,
+  Compile,
   Bootstrap,
   ...Operations
 }).map(([label, value]) => ({ label, value }));
