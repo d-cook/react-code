@@ -1,11 +1,6 @@
 import * as React from "react";
 import { ReactElement } from "react";
-
-type Key = string | number;
-type Inputs = {
-  value: any;
-  onValueClicked: (path: Key[], val: any) => void;
-};
+import { Key, ViewInputs } from "ViewInputs";
 
 const valueStyles = {
   padding: "0"
@@ -39,8 +34,9 @@ const recordStyles = {
 
 export default function JsonView({
   value,
-  onValueClicked
-}: Inputs): ReactElement {
+  onValueClicked,
+  nestedViews
+}: ViewInputs): ReactElement {
   const MakeView = (
     value: any,
     path: Key[],
@@ -65,18 +61,23 @@ export default function JsonView({
         : type === "record"
         ? recordStyles
         : valueStyles;
+    const view = (nestedViews || []).filter(
+      (v: any) => v.matches(value) && typeof v.makeView === "function"
+    )[0];
+    const showValueOnClick = (e: MouseEvent) => {
+      e.stopPropagation();
+      onValueClicked?.call(null, path, {
+        [isKey ? "key" : "value"]: value
+      });
+    };
+    if (type !== "repeat" && view) {
+      return view.makeView({ value, onValueClicked, nestedViews });
+    }
     return (
-      <div
-        class={"json-" + type}
-        onClick={(e: MouseEvent) => {
-          e.stopPropagation();
-          onValueClicked?.call(null, path, {
-            [isKey ? "key" : "value"]: value
-          });
-        }}
-        style={styles}
-      >
-        {type === "list"
+      <div class={"json-" + type} onClick={showValueOnClick} style={styles}>
+        {type === "repeat"
+          ? "[^" + (vals.length - vals.indexOf(value) - 1) + "]"
+          : type === "list"
           ? (value as any[]).map((v, i) =>
               MakeView(v, path.concat(i), vals.concat([value]))
             )
@@ -89,8 +90,6 @@ export default function JsonView({
             ))
           : type === "function"
           ? "[func]"
-          : type === "repeat"
-          ? "[^" + (vals.length - vals.indexOf(value) - 1) + "]"
           : !isKey
           ? JSON.stringify(value)
           : value}
