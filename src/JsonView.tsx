@@ -90,7 +90,7 @@ export default function JsonView({
           : type === "function"
           ? "[func]"
           : type === "repeat"
-          ? "[...]"
+          ? "[^" + (vals.length - vals.indexOf(value) - 1) + "]"
           : !isKey
           ? JSON.stringify(value)
           : value}
