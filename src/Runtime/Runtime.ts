@@ -31,6 +31,9 @@ function Apply(context: Context, func: Func | Function, argVals: any[]): any {
       return null;
     }
   }
+  const isValidFunc =
+    !!func && typeof func === "object" && Array.isArray(func.code);
+  if (!isValidFunc) return func;
   const ctx = EvalFunc(func.context || context, func, argVals);
   const vals = ctx.values;
   return vals.length > 0 ? vals[vals.length - 1] : null;

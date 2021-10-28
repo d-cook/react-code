@@ -127,16 +127,14 @@ function If(this: Context, condition: any, T: any, F: any): any {
   return Apply(this, IsTrue(condition) ? T : F, []);
 }
 
-function And(this: Context, val: any, ...otherVals: any[]): boolean {
-  if (Not(val)) return false;
-  if (otherVals.length < 1) return true;
+function And(this: Context, val: any, ...otherVals: any[]): any {
+  if (Not(val) || otherVals.length < 1) return val;
   const [next, ...rest] = otherVals;
   return And.call(this, Apply(this, next, []), ...rest);
 }
 
 function Or(this: Context, val: any, ...otherVals: any[]): boolean {
-  if (IsTrue(val)) return true;
-  if (otherVals.length < 1) return false;
+  if (IsTrue(val) || otherVals.length < 1) return val;
   const [next, ...rest] = otherVals;
   return Or.call(this, Apply(this, next, []), ...rest);
 }
