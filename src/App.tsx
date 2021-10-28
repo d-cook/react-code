@@ -19,8 +19,11 @@ export default function App() {
     Array.isArray(v.code) &&
     Array.isArray(v.argNames) &&
     (v.context || v.context === null);
-  const typeOf = (v: any) =>
-    v === null ? "null" : Array.isArray(v) ? "array" : typeof v;
+  const safeVal = (v: any) => {
+    if (Array.isArray(v)) return v.map(safeVal);
+    if (!v || typeof v !== "object") return v;
+    return isFunc(v) ? ".FN." : isContext(v) ? ".CX." : v;
+  };
   return (
     <div
       className="App"
@@ -33,15 +36,18 @@ export default function App() {
       }}
     >
       <JsonView
-        value={[1, 2, { x: 3, y: 4 }, "5 6"]}
+        value={[
+          { a: 123, b: [4, 5, 6], c: 789 },
+          [1, 2, { x: 3, y: 4 }, "5 6"]
+        ]}
         onValueClicked={onValueClicked}
       />
       <JsonView
-        value={{ a: 123, b: [4, 5, 6], c: 789 }}
+        value={["Runtime (raw):", RootContext]}
         onValueClicked={onValueClicked}
       />
       <JsonView
-        value={RootContext}
+        value={["Runtime (Formatted):", RootContext]}
         onValueClicked={onValueClicked}
         nestedViews={[
           {
@@ -51,7 +57,15 @@ export default function App() {
                 value={{
                   argNames: value.argNames,
                   code: Object.fromEntries(
-                    value.code.map(({ label, value }) => [label, typeOf(value)])
+                    value.code.map(({ label, value, op, args }: any) => [
+                      label,
+                      op || args
+                        ? [
+                            op,
+                            ...args.map(([i, v]) => [i, i === -1 ? "..." : v])
+                          ]
+                        : safeVal(value)
+                    ])
                   )
                 }}
                 onValueClicked={onValueClicked}
@@ -68,7 +82,7 @@ export default function App() {
                   values: Object.fromEntries(
                     value.values.map((v, i) => [
                       value.source.code[i].label,
-                      typeOf(v)
+                      safeVal(v)
                     ])
                   ),
                   source: value.source
