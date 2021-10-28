@@ -45,7 +45,7 @@ export default function JsonView({
     value: any,
     path: Key[],
     vals: any[],
-    escape = true
+    isKey = false
   ): ReactElement => {
     const type =
       value === null
@@ -68,7 +68,12 @@ export default function JsonView({
     return (
       <div
         class={"json-" + type}
-        onClick={() => onValueClicked?.call(null, path, value)}
+        onClick={(e: MouseEvent) => {
+          e.stopPropagation();
+          onValueClicked?.call(null, path, {
+            [isKey ? "key" : "value"]: value
+          });
+        }}
         style={styles}
       >
         {type === "list"
@@ -78,15 +83,15 @@ export default function JsonView({
           : type === "record"
           ? Object.entries(value).map(([k, v]) => (
               <>
-                {MakeView(k, path.concat("k" + k), vals, false)} :
-                {MakeView(v, path.concat("v" + k), vals.concat(value))}
+                {MakeView(k, path.concat(k), vals, true)} :
+                {MakeView(v, path.concat(k), vals.concat(value))}
               </>
             ))
           : type === "function"
           ? "[func]"
           : type === "repeat"
           ? "[...]"
-          : escape
+          : !isKey
           ? JSON.stringify(value)
           : value}
       </div>
