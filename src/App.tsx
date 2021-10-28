@@ -49,26 +49,26 @@ export default function App() {
                 value={{
                   argNames: value.argNames,
                   code: Object.fromEntries(
-                    value.code.map(({ label, value }) => [label, value])
+                    value.code.map(({ label, value }) => [label, "..." || value])
                   )
                 }}
                 onValueClicked={onValueClicked}
-                nestedViews={[] || nestedViews}
+                nestedViews={nestedViews}
               />
             )
           },
           {
-            matches: (v: any) => 1 && isContext(v),
+            matches: (v: any) => 0 && isContext(v),
             makeView: ({ value, onValueClicked, nestedViews }: any) => (
               <JsonView
                 value={{
                   argVals: value.argVals,
                   values: Object.fromEntries(
-                    value.values.map((v, i) => [value.source.code[i].label, v])
+                    value.values.map((v, i) => [value.source.code[i].label, "..." || v])
                   )
                 }}
                 onValueClicked={onValueClicked}
-                nestedViews={[] || nestedViews}
+                nestedViews={[]||nestedViews}
               />
             )
           }
