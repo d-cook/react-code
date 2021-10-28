@@ -19,6 +19,8 @@ export default function App() {
     Array.isArray(v.code) &&
     Array.isArray(v.argNames) &&
     (v.context || v.context === null);
+  const typeOf = (v: any) =>
+    v === null ? "null" : Array.isArray(v) ? "array" : typeof v;
   return (
     <div
       className="App"
@@ -49,7 +51,7 @@ export default function App() {
                 value={{
                   argNames: value.argNames,
                   code: Object.fromEntries(
-                    value.code.map(({ label, value }) => [label, "..." || value])
+                    value.code.map(({ label, value }) => [label, typeOf(value)])
                   )
                 }}
                 onValueClicked={onValueClicked}
@@ -58,17 +60,21 @@ export default function App() {
             )
           },
           {
-            matches: (v: any) => 0 && isContext(v),
+            matches: (v: any) => isContext(v),
             makeView: ({ value, onValueClicked, nestedViews }: any) => (
               <JsonView
                 value={{
                   argVals: value.argVals,
                   values: Object.fromEntries(
-                    value.values.map((v, i) => [value.source.code[i].label, "..." || v])
-                  )
+                    value.values.map((v, i) => [
+                      value.source.code[i].label,
+                      typeOf(v)
+                    ])
+                  ),
+                  source: value.source
                 }}
                 onValueClicked={onValueClicked}
-                nestedViews={[]||nestedViews}
+                nestedViews={nestedViews}
               />
             )
           }
